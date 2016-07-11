@@ -121,9 +121,9 @@ typedef struct {
 
 /* OSPF Link State Request */
 typedef struct {
-	uint32_t type;          /* LS type */
-	uint32_t link_id;       /* Link State ID */
-	uint32_t adv_rtr;       /* Advertising Router */
+	uint32_t ls_type;					/* LS type */
+	uint32_t ls_id;						/* Link State ID */
+	uint32_t ad_router;					/* Advertising Router */
 } ospf_lsr;
 
 #endif
