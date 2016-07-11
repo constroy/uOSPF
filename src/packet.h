@@ -7,7 +7,7 @@
 #define OSPF_TYPE_DD		2
 #define OSPF_TYPE_LSR		3
 #define OSPF_TYPE_LSU		4
-#define OSPF_TYPE_ACK		5
+#define OSPF_TYPE_LSACK		5
 
 /* OSPF packet header structure. */
 typedef struct {

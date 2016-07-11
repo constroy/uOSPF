@@ -25,6 +25,7 @@ void process_hello(interface *iface,
 		nbr->ip = src;
 		nbr->priority = hello->priority;
 		nbr->num_lsah = 0;
+		nbr->num_lsr = 0;
 		nbr->next = iface->nbrs;
 		iface->nbrs = nbr;
 		++iface->num_nbr;

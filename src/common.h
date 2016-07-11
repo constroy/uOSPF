@@ -20,12 +20,14 @@ extern const int max_age_diff;
 
 extern const char *ospf_type_name[];
 
+extern int sock;
 extern int num_area;
 extern area areas[];
 extern int num_if;
 extern interface ifs[];
 extern in_addr_t myid;
-extern in_addr_t brd_addr;
+extern in_addr_t all_spf_routers;
+extern in_addr_t all_d_routers;
 
 int32_t get_lsa_seq();
 

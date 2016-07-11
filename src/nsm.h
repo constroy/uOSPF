@@ -11,6 +11,6 @@ extern const char *state_str[];
 /* neighbor state machine */
 extern const transition nsm[];
 
-void add_event(interface *iface, struct neighbor *nbr, nbr_event event);
+void add_event(interface *iface, neighbor *nbr, nbr_event event);
 
 #endif

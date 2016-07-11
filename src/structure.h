@@ -31,7 +31,7 @@ typedef struct {
 	nbr_state dst_state;
 } transition;
 
-struct neighbor {
+typedef struct neighbor {
 	int inact_timer;					/* Inactivity Timer */
 	int rxmt_timer;
 	nbr_state state;
@@ -43,16 +43,21 @@ struct neighbor {
 	in_addr_t ip;                /* IP */
 	uint8_t priority;
 	int num_lsah;
-	lsa_header lsahs[64];
+	lsa_header lsahs[256];
+	int num_lsr;
+	ospf_lsr lsrs[256];
+	int num_ack;
+	lsa_header acks[256];
 	//int lsa_headers_state[10];
 	//int lsa_headers_count;
 	struct neighbor *next;
-};
+} neighbor;
 
 typedef struct {
 	char name[16];
 	int state;
 	int sock;
+	struct area *a;
 	in_addr_t area_id;
 	in_addr_t ip;
 	in_addr_t mask;
@@ -66,13 +71,13 @@ typedef struct {
 	uint16_t inf_trans_delay;
 	int rxmt_interval;
 	int num_nbr;
-	struct neighbor *nbrs;
+	neighbor *nbrs;
 } interface;
 
-typedef struct {
+typedef struct area {
 	int num_if;
 	interface *ifs[16];
-	uint32_t num_lsa;
+	int num_lsa;
 	lsa_header *lsas[256];
 	//~ int my_lsa_sequence;
 	//~ struct as_external_lsa ases[10];        /* 单独存一个非本 Area 的外部第五类 */

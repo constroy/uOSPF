@@ -10,9 +10,7 @@
 #include "nsm.h"
 
 
-void process_dd(interface *iface,
-				neighbor *nbr,
-				const ospf_header *ospfhdr) {
+void process_dd(interface *iface, neighbor *nbr, const ospf_header *ospfhdr) {
 	ospf_dd * dd = (ospf_dd *)((uint8_t *)ospfhdr + sizeof(ospf_header));
 	if (dd->flags & DD_FLAG_I) {
 		if (dd->flags & DD_FLAG_M && ntohl(myid) < ntohl(ospfhdr->router_id)) {
@@ -49,9 +47,7 @@ void process_dd(interface *iface,
 	}
 }
 
-void produce_dd(const interface *iface,
-				const neighbor *nbr,
-				ospf_header *ospfhdr) {
+void produce_dd(const interface *iface, const neighbor *nbr, ospf_header *ospfhdr) {
 	ospf_dd *dd = (ospf_dd *)((uint8_t *)ospfhdr + sizeof(ospf_header));
 	lsa_header *lsah = dd->lsahs;
 
@@ -63,7 +59,8 @@ void produce_dd(const interface *iface,
 	if (nbr->state == S_ExStart) dd->flags |= DD_FLAG_I;
 	if (nbr->more) dd->flags |= DD_FLAG_M;
 	dd->seq_num = htonl(nbr->dd_seq_num);
-	if (nbr->state == S_Exchange) {
+	if (nbr->state == S_Exchange && nbr->more) {
+
 		for (int i = 0; i < iface->a->num_lsa; ++i)
 			memcpy(lsah++, iface->a->lsas[i], sizeof(lsa_header));
 	}
