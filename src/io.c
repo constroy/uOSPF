@@ -37,7 +37,6 @@ void if_init(int sock) {
 			ioctl(sock, SIOCSIFFLAGS, ifrs + i);
 			/* bind socket to this interface */
 			ifs[num_if].sock = socket(AF_INET, SOCK_RAW, IPPROTO_OSPF);
-			puts(strerror(errno));
 			setsockopt(ifs[num_if].sock, SOL_SOCKET, SO_BINDTODEVICE,
 					ifrs + i, sizeof(struct ifreq));
 			++num_if;
@@ -72,11 +71,9 @@ interface *recv_ospf(int sock, uint8_t buf[], int size, in_addr_t *src) {
 			if (cksum((uint16_t *)ospfhdr, ntohs(ospfhdr->length))) continue;
 			printf("%s received from %s\n", ospf_type_name[ospfhdr->type],
 				inet_ntoa((struct in_addr){*src}));
-			/* only in broadcast network */
-			if (iph->daddr == brd_addr)
-				for (int i = 0; i < num_if; ++i)
-					if ((iph->saddr & ifs[i].mask) == (ifs[i].ip & ifs[i].mask)) {
-						return ifs + i;
+			for (int i = 0; i < num_if; ++i)
+				if ((iph->saddr & ifs[i].mask) == (ifs[i].ip & ifs[i].mask)) {
+					return ifs + i;
 			}
 		}
 	}
