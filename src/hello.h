@@ -5,7 +5,7 @@
 #include "structure.h"
 
 void process_hello(interface *iface,
-				   struct neighbor *nbr,
+				   neighbor *nbr,
 				   const ospf_header *ospfhdr,
 				   in_addr_t src);
 

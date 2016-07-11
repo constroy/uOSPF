@@ -5,11 +5,11 @@
 #include "structure.h"
 
 void process_dd(interface *iface,
-				struct neighbor *nbr,
+				neighbor *nbr,
 				const ospf_header *ospfhdr);
 
 void produce_dd(const interface *iface,
-				const struct neighbor *nbr,
+				const neighbor *nbr,
 				ospf_header *ospfhdr);
 
 #endif
