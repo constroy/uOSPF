@@ -15,20 +15,22 @@
 #define NUM_AREA			256
 #define NUM_INTERFACE		256
 
+#define OPTIONS				0x08
+
 extern const int max_age;
 extern const int max_age_diff;
 
 extern const char *ospf_type_name[];
 
 extern int sock;
+extern int upd;
 extern int num_area;
 extern area areas[];
 extern int num_if;
 extern interface ifs[];
 extern in_addr_t myid;
+extern lsa_header *rt_lsa;
 extern in_addr_t all_spf_routers;
 extern in_addr_t all_d_routers;
-
-int32_t get_lsa_seq();
 
 #endif

@@ -38,9 +38,8 @@ typedef struct neighbor {
 	int master;
 	int more;
 	uint32_t dd_seq_num;
-	//unsigned int lsr_sequence;      /* 最终 LSR 使用的序号 */
-	in_addr_t router_id;         /* Router ID */
-	in_addr_t ip;                /* IP */
+	in_addr_t router_id;				/* Router ID */
+	in_addr_t ip;						/* IP */
 	uint8_t priority;
 	int num_lsah;
 	lsa_header lsahs[256];
@@ -48,8 +47,6 @@ typedef struct neighbor {
 	ospf_lsr lsrs[256];
 	int num_ack;
 	lsa_header acks[256];
-	//int lsa_headers_state[10];
-	//int lsa_headers_count;
 	struct neighbor *next;
 } neighbor;
 
@@ -74,18 +71,21 @@ typedef struct {
 	neighbor *nbrs;
 } interface;
 
+typedef struct {
+	in_addr_t ip;
+	in_addr_t mask;
+	in_addr_t next;
+	uint16_t metric;
+	const char *iface;
+} route;
+
 typedef struct area {
 	int num_if;
 	interface *ifs[16];
 	int num_lsa;
 	lsa_header *lsas[256];
-	//~ int my_lsa_sequence;
-	//~ struct as_external_lsa ases[10];        /* 单独存一个非本 Area 的外部第五类 */
-	//~ int ases_count;
-	//~ struct ip_list ip_lists[10];            /* FIXME: IP 列表 （下标就是 lsdb_items 的下标） */
-	//~ int ip_lists_count;
-	//~ struct path paths[10];                  /* 路由路径 */
-	//~ int paths_count;
+	int num_route;
+	route routes[256];
 } area;
 
 #endif

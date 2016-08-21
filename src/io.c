@@ -10,9 +10,10 @@
 
 #define IPPROTO_OSPF 89
 
-void if_init(int sock) {
+void if_init() {
 	struct ifconf ifc;
 	struct ifreq ifrs[NUM_INTERFACE];
+	sock = socket(AF_PACKET, SOCK_DGRAM, htons(ETHERTYPE_IP));
 	ifc.ifc_len = sizeof(ifrs);
 	ifc.ifc_req = ifrs;
 	ioctl(sock, SIOCGIFCONF, &ifc);

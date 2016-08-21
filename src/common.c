@@ -11,10 +11,6 @@ area areas[NUM_AREA];
 int num_if;
 interface ifs[NUM_INTERFACE];
 in_addr_t myid;
+lsa_header *rt_lsa;
 in_addr_t all_spf_routers;
 in_addr_t all_d_routers;
-
-int32_t get_lsa_seq() {
-	static int32_t lsa_seq = 0x80000001;
-	return htonl(lsa_seq++);
-}

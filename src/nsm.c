@@ -3,7 +3,6 @@
 #include <stdio.h>
 
 #include "common.h"
-#include "lsdb.h"
 
 const char *state_str[] = {
 	"Down",
@@ -38,15 +37,15 @@ const transition nsm[] = {
 void add_event(interface *iface, neighbor *nbr, nbr_event event) {
 	const int num = 8;
 	puts("--------------------------------");
+	printf("Interface: %s\n", iface->name);
+	printf("Neighbor: %s\n", inet_ntoa((struct in_addr){nbr->ip}));
 	printf("Old State: %s\n", state_str[nbr->state]);
 	printf("Event: %s\n", event_str[event]);
 	for (int i = 0; i < num; ++i)
 		if ((nbr->state == nsm[i].src_state) && (event == nsm[i].event)) {
 			nbr->state = nsm[i].dst_state;
-			if (nbr->state == S_Full) {
-				if (iface->dr == nbr->router_id) iface->state = 1;
-				gen_router_lsa(iface->a);
-			}
+			if (nbr->state == S_Full)
+				if (iface->dr == nbr->ip) iface->state = 1;
 			break;
 		}
 	printf("New State: %s\n", state_str[nbr->state]);

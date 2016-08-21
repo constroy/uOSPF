@@ -63,7 +63,7 @@ typedef struct {
 } lsa_header;
 
 #define ROUTERLSA_ROUTER			1
-#define ROUTERLSA_TRANSNET			2
+#define ROUTERLSA_TRANSIT			2
 #define ROUTERLSA_STUB				3
 #define ROUTERLSA_VIRTUAL			4
 
@@ -78,7 +78,7 @@ typedef struct {
 		uint8_t type;
 		uint8_t tos;
 		uint16_t metric;
-	} links[0];
+	} links[];
 } router_lsa;
 
 /* OSPF Network-LSAs structure. */
@@ -90,16 +90,20 @@ typedef struct {
 /* OSPF Summary-LSAs structure. */
 typedef struct {
 	in_addr_t mask;
-	uint8_t tos;
-	uint8_t metric[3];
+	union {
+		uint8_t tos;
+		uint32_t metric;
+	};
 } summary_lsa;
 
 /* OSPF AS-external-LSAs structure. */
 typedef struct {
 	in_addr_t mask;
 	struct {
-		uint8_t tos;
-		uint8_t metric[3];
+		union {
+			uint8_t tos;
+			uint32_t metric;
+		};
 		in_addr_t fwd_addr;
 		uint32_t route_tag;
 	} e[];

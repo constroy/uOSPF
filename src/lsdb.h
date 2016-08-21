@@ -4,9 +4,10 @@
 #include "packet.h"
 #include "structure.h"
 
+
 uint16_t fletcher16(const uint8_t *data, size_t len);
 
-void gen_router_lsa(area *a);
+lsa_header *gen_router_lsa(area *a);
 
 void add_lsah(neighbor *nbr, const lsa_header *lsah);
 
@@ -17,6 +18,6 @@ int cmp_lsah(const lsa_header *a, const lsa_header *b);
 
 lsa_header *find_lsa(const area *a, const lsa_header *lsah);
 
-void insert_lsa(area *a, const lsa_header *lsah);
+lsa_header *insert_lsa(area *a, const lsa_header *lsah);
 
 #endif

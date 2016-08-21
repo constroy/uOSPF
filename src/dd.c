@@ -1,8 +1,6 @@
 #include "dd.h"
 
-#include <stdio.h>
 #include <string.h>
-#include <time.h>
 
 #include "common.h"
 #include "io.h"
@@ -15,7 +13,7 @@ void process_dd(interface *iface, neighbor *nbr, const ospf_header *ospfhdr) {
 	if (dd->flags & DD_FLAG_I) {
 		if (dd->flags & DD_FLAG_M && ntohl(myid) < ntohl(ospfhdr->router_id)) {
 			nbr->master = 0;
-			nbr->dd_seq_num = dd->seq_num;
+			nbr->dd_seq_num = ntohl(dd->seq_num);
 			add_event(iface, nbr, E_NegotiationDone);
 		}
 	} else {
@@ -52,8 +50,7 @@ void produce_dd(const interface *iface, const neighbor *nbr, ospf_header *ospfhd
 	lsa_header *lsah = dd->lsahs;
 
 	dd->mtu = htons(1500);
-	/* support NSSA */
-	dd->options = 0x08;
+	dd->options = OPTIONS;
 	dd->flags = 0;
 	if (nbr->master) dd->flags |= DD_FLAG_MS;
 	if (nbr->state == S_ExStart) dd->flags |= DD_FLAG_I;

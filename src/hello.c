@@ -20,7 +20,7 @@ void process_hello(interface *iface,
 		nbr->rxmt_timer = 0;
 		nbr->master = 1;
 		nbr->more = 1;
-		nbr->dd_seq_num = clock();
+		nbr->dd_seq_num = time(NULL);
 		nbr->router_id = ospfhdr->router_id;
 		nbr->ip = src;
 		nbr->priority = hello->priority;
@@ -29,12 +29,10 @@ void process_hello(interface *iface,
 		nbr->next = iface->nbrs;
 		iface->nbrs = nbr;
 		++iface->num_nbr;
-		gen_router_lsa(iface->a);
 	}
 	nbr->inact_timer = 0;
 	if (iface->dr != hello->d_router) {
 		iface->dr = hello->d_router;
-		gen_router_lsa(iface->a);
 	}
 	iface->bdr = hello->bd_router;
 	add_event(iface, nbr, E_HelloReceived);
@@ -57,8 +55,7 @@ void produce_hello(const interface *iface, ospf_header *ospfhdr) {
 
 	hello->network_mask = iface->mask;
 	hello->hello_interval = htons(iface->hello_interval);
-	/* support NSSA */
-	hello->options = 0x08;
+	hello->options = OPTIONS;
 	/* avoid becoming DR or BDR */
 	hello->priority = 0;
 	hello->dead_interval = htonl(iface->dead_interval);

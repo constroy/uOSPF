@@ -1,6 +1,5 @@
 #include "lsu.h"
 
-#include <stdio.h>
 #include <string.h>
 
 #include "lsdb.h"
@@ -43,6 +42,16 @@ void produce_lsu(const area *a, const neighbor *nbr, ospf_header *ospfhdr) {
 				p += len;
 				break;
 			}
+	ospfhdr->type = OSPF_TYPE_LSU;
+	ospfhdr->length = htons(p - (uint8_t *)ospfhdr);
+}
+
+void produce_upd(const area *a, const lsa_header *lsa, ospf_header *ospfhdr) {
+	uint8_t *p = (uint8_t *)ospfhdr + sizeof(ospf_header) + 4;
+	*((uint32_t *)((uint8_t *)ospfhdr + sizeof(ospf_header))) = ntohl(1);
+	size_t len = htons(lsa->length);
+	memcpy(p, lsa, len);
+	p += len;
 	ospfhdr->type = OSPF_TYPE_LSU;
 	ospfhdr->length = htons(p - (uint8_t *)ospfhdr);
 }

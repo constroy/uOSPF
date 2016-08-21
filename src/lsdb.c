@@ -4,13 +4,17 @@
 
 #include "common.h"
 
-
+int32_t get_lsa_seq() {
+	static int32_t lsa_seq = 0x80000001;
+	return htonl(lsa_seq++);
+}
 
 /*
  * This function is from GNU Zebra.
  * Copyright (C) 1999, 2000 Toshiaki Takada
  * Fletcher Checksum -- Refer to RFC1008.
  */
+
 #define MODX						4102
 #define LSA_CHECKSUM_OFFSET			15
 
@@ -36,32 +40,13 @@ uint16_t fletcher16(const uint8_t *data, size_t len) {
 	return (x << 8) + y;
 }
 
-//~ uint16_t fletcher16(const uint8_t *data, size_t len) {
-	//~ uint16_t sum1 = 0xff, sum2 = 0xff;
-	//~ size_t tlen;
-
-	//~ while (len) {
-		//~ tlen = len >= 20 ? 20 : len;
-		//~ len -= tlen;
-		//~ do {
-				//~ sum2 += sum1 += *data++;
-		//~ } while (--tlen);
-		//~ sum1 = (sum1 & 0xff) + (sum1 >> 8);
-		//~ sum2 = (sum2 & 0xff) + (sum2 >> 8);
-	//~ }
-	//~ /* Second reduction step to reduce sums to 8 bits */
-	//~ sum1 = (sum1 & 0xff) + (sum1 >> 8);
-	//~ sum2 = (sum2 & 0xff) + (sum2 >> 8);
-	//~ return sum2 << 8 | sum1;
-//~ }
-
-void gen_router_lsa(area *a) {
+lsa_header *gen_router_lsa(area *a) {
 	uint8_t buff[BUFFER_SIZE];
 	lsa_header *lsah = (lsa_header *)buff;
 	router_lsa *rlsa = (router_lsa *)(buff + sizeof(lsa_header));
 	struct link *l = rlsa->links;
 	lsah->age = 0;
-	lsah->options = 0x08;
+	lsah->options = OPTIONS;
 	lsah->type = OSPF_ROUTER_LSA;
 	lsah->id = myid;
 	lsah->ad_router = myid;
@@ -78,29 +63,29 @@ void gen_router_lsa(area *a) {
 			l->tos = 0;
 			l->metric = a->ifs[i]->cost;
 			++l;
-		} else if (a->ifs[i]->num_nbr == 1) {
-			/* P2P */
-			if (a->ifs[i]->nbrs->state == S_Full) {
-				/* Router */
-				l->type = ROUTERLSA_ROUTER;
-				l->id = a->ifs[i]->nbrs->router_id;
-				l->data = a->ifs[i]->ip;
-				l->tos = 0;
-				l->metric = a->ifs[i]->cost;
-				++l;
-			}
-			/* SubNet */
-			l->type = ROUTERLSA_STUB;
-			l->id = a->ifs[i]->ip & a->ifs[i]->mask;
-			l->data = a->ifs[i]->mask;
-			l->tos = 0;
-			l->metric = a->ifs[i]->cost;
-			++l;
+		//~ } else if (a->ifs[i]->num_nbr == 1) {
+			//~ /* P2P */
+			//~ if (a->ifs[i]->nbrs->state == S_Full) {
+				//~ /* Router */
+				//~ l->type = ROUTERLSA_ROUTER;
+				//~ l->id = a->ifs[i]->nbrs->router_id;
+				//~ l->data = a->ifs[i]->ip;
+				//~ l->tos = 0;
+				//~ l->metric = a->ifs[i]->cost;
+				//~ ++l;
+			//~ }
+			//~ /* SubNet */
+			//~ l->type = ROUTERLSA_STUB;
+			//~ l->id = a->ifs[i]->ip & a->ifs[i]->mask;
+			//~ l->data = a->ifs[i]->mask;
+			//~ l->tos = 0;
+			//~ l->metric = a->ifs[i]->cost;
+			//~ ++l;
 		} else {
 			/* Broadcast */
 			if (a->ifs[i]->state == 1) {
 				/* TransNet */
-				l->type = ROUTERLSA_TRANSNET;
+				l->type = ROUTERLSA_TRANSIT;
 				l->id = a->ifs[i]->dr;
 				l->data = a->ifs[i]->ip;
 				l->tos = 0;
@@ -120,12 +105,11 @@ void gen_router_lsa(area *a) {
 	rlsa->num_link = htons((l - rlsa->links));
 	size_t len = sizeof(lsa_header) + sizeof(router_lsa) +
 				(l - rlsa->links) * sizeof(struct link);
-	/* length excluding the size of age */
 	lsah->length = htons(len);
 	lsah->checksum = 0;
 	lsah->checksum = htons(fletcher16(buff + sizeof(lsah->age),
 								ntohs(lsah->length) - sizeof(lsah->age)));
-	insert_lsa(a, lsah);
+	return insert_lsa(a, lsah);
 }
 
 int lsah_eql(const lsa_header *a, const lsa_header *b) {
@@ -134,12 +118,19 @@ int lsah_eql(const lsa_header *a, const lsa_header *b) {
 
 /* return value < 0: b is newer, > 0: a is newer , = 0: the same */
 int cmp_lsah(const lsa_header *a, const lsa_header *b) {
-	if (a->seq_num != b->seq_num) return a->seq_num - b->seq_num;
-	else if (a->checksum != b->checksum) return a->checksum - b->checksum;
-	else if (a->age == max_age) return +1;
-	else if (b->age == max_age) return -1;
-	else if (abs(a->age - b->age) < max_age_diff) return b->age - a->age;
-	else return 0;
+	return -1;
+	if (a->seq_num != b->seq_num)
+		return ntohl(a->seq_num) - ntohl(b->seq_num);
+	else if (a->checksum != b->checksum)
+		return ntohs(a->checksum) - ntohs(b->checksum);
+	else if (ntohs(a->age) == max_age)
+		return +1;
+	else if (ntohs(b->age) == max_age)
+		return -1;
+	else if (abs(ntohs(a->age) - ntohs(b->age)) < max_age_diff)
+		return ntohs(b->age) - ntohs(a->age);
+	else
+		return 0;
 }
 
 void add_lsah(neighbor *nbr, const lsa_header *lsah) {
@@ -158,15 +149,16 @@ lsa_header *find_lsa(const area *a, const lsa_header *lsah) {
 	return NULL;
 }
 
-void insert_lsa(area *a, const lsa_header *lsah) {
-	size_t len = ntohs(lsah->length);
+lsa_header *insert_lsa(area *a, const lsa_header *lsah) {
 	int i;
 	for (i = 0; i < a->num_lsa; ++i)
 		if (lsah_eql(a->lsas[i], lsah)) {
 			if (cmp_lsah(a->lsas[i], lsah) < 0) break;
-			else return;
+			else return NULL;
 		}
+	size_t len = ntohs(lsah->length);
 	a->lsas[i] = realloc(a->lsas[i], len);
 	memcpy(a->lsas[i], lsah, len);
 	a->num_lsa += i == a->num_lsa;
+	return a->lsas[i];
 }

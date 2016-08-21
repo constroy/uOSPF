@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -lpthread
+CFLAGS = -g -Wall -lpthread
 SRC = $(wildcard *.c)
 HEAD = $(wildcard *.h)
 OBJ = $(SRC:.c=.o)

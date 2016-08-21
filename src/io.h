@@ -4,7 +4,7 @@
 #include "common.h"
 #include "packet.h"
 
-void if_init(int sock);
+void if_init();
 
 interface *recv_ospf(int sock, uint8_t buf[], int size, in_addr_t *src);
 

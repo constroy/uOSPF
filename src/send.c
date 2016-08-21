@@ -1,7 +1,5 @@
 #include "send.h"
 
-#include <stdio.h>
-
 #include "lsack.h"
 #include "common.h"
 #include "dd.h"
@@ -15,16 +13,15 @@
 void *send_loop(void *p) {
 	uint8_t buf[BUFFER_SIZE];
 	while (*(int *)p) {
+		/* BUG: mutex absent in critical area */
 		for (int i = 0; i < num_if; ++i) {
 			/* delete neighbors out of date */
-			/* BUG: mutex absent in critical area */
 			neighbor **p = &ifs[i].nbrs;
 			for (neighbor *q = *p; q; q = *p) {
 				if (++q->inact_timer >= ifs[i].dead_interval) {
 					--ifs[i].num_nbr;
 					*p = q->next;
 					free(q);
-					gen_router_lsa(ifs[i].a);
 				} else {
 					p = &q->next;
 				}
@@ -64,6 +61,12 @@ void *send_loop(void *p) {
 						produce_lsu(ifs[i].a, p,
 								(ospf_header *)(buf + sizeof(struct iphdr)));
 						send_ospf(ifs + i, (struct iphdr *)buf, p->ip);
+					}
+					if (rt_lsa && p->state == S_Full) {
+						produce_upd(ifs[i].a, rt_lsa,
+								(ospf_header *)(buf + sizeof(struct iphdr)));
+						send_ospf(ifs + i, (struct iphdr *)buf, p->ip);
+						rt_lsa = NULL;
 					}
 				}
 				/* send lsack packet */
