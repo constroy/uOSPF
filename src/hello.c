@@ -3,7 +3,6 @@
 #include <time.h>
 
 #include "common.h"
-#include "lsdb.h"
 #include "nsm.h"
 
 void process_hello(interface *iface,
