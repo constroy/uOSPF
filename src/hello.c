@@ -20,7 +20,7 @@ void process_hello(interface *iface,
 		nbr->rxmt_timer = 0;
 		nbr->master = 1;
 		nbr->more = 1;
-		nbr->dd_seq_num = time(NULL);
+		nbr->dd_seq_num = 2333;//time(NULL);
 		nbr->router_id = ospfhdr->router_id;
 		nbr->ip = src;
 		nbr->priority = hello->priority;

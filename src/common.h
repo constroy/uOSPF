@@ -15,7 +15,7 @@
 #define NUM_AREA			256
 #define NUM_INTERFACE		256
 
-#define OPTIONS				0x08
+#define OPTIONS				0x02
 
 extern const int max_age;
 extern const int max_age_diff;

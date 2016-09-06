@@ -54,6 +54,7 @@ void dijkstra(int root) {
 						k = find_node(l->id);
 						break;
 					case ROUTERLSA_STUB:
+						printf("leaf: %s\n", inet_ntoa((struct in_addr){l->id}));
 						leaf->id = l->id;
 						leaf->mask = l->data;
 						leaf->next = nodes[p].next;
@@ -155,6 +156,13 @@ const char *find_if_name(const area *a, in_addr_t ip) {
 
 void update_table(area *a) {
 	spt(a->lsas, a->num_lsa);
+	//
+	for (int i = 0; i < num_node; ++i) {
+		printf("node: %s\n", inet_ntoa((struct in_addr){nodes[i].id}));
+		printf("next: %s\n", inet_ntoa((struct in_addr){nodes[i].next}));
+		printf("dist: %hu\n", nodes[i].dist);
+	}
+	//
 	for (int i = 0; i < num_node; ++i)
 		if (nodes[i].mask && nodes[i].dist < DISTANCE_INF) {
 			a->routes[a->num_route].mask = nodes[i].mask;
