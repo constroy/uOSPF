@@ -63,24 +63,6 @@ lsa_header *gen_router_lsa(area *a) {
 			l->tos = 0;
 			l->metric = a->ifs[i]->cost;
 			++l;
-		//~ } else if (a->ifs[i]->num_nbr == 1) {
-			//~ /* P2P */
-			//~ if (a->ifs[i]->nbrs->state == S_Full) {
-				//~ /* Router */
-				//~ l->type = ROUTERLSA_ROUTER;
-				//~ l->id = a->ifs[i]->nbrs->router_id;
-				//~ l->data = a->ifs[i]->ip;
-				//~ l->tos = 0;
-				//~ l->metric = a->ifs[i]->cost;
-				//~ ++l;
-			//~ }
-			//~ /* SubNet */
-			//~ l->type = ROUTERLSA_STUB;
-			//~ l->id = a->ifs[i]->ip & a->ifs[i]->mask;
-			//~ l->data = a->ifs[i]->mask;
-			//~ l->tos = 0;
-			//~ l->metric = a->ifs[i]->cost;
-			//~ ++l;
 		} else {
 			/* Broadcast */
 			if (a->ifs[i]->state == 1) {

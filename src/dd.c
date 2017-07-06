@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "common.h"
-#include "io.h"
 #include "lsdb.h"
 #include "nsm.h"
 

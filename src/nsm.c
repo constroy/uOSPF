@@ -49,5 +49,5 @@ void add_event(interface *iface, neighbor *nbr, nbr_event event) {
 			break;
 		}
 	printf("New State: %s\n", state_str[nbr->state]);
-	puts("--------------------------------");             /* 最后状态变化 */
+	puts("--------------------------------");
 }
